@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CONGRATULATION YOU JUST GOT HACKED</title>
+  <style>
+    :root{
+      --bg:#06060a;
+      --accent:#ff004d;
+      --accent2:#00ffd5;
+      --glow: 0 0 30px rgba(255,0,77,0.25), 0 0 60px rgba(0,255,213,0.08);
+      --mono: 'Courier New', monospace;
+    }
+    html,body{height:100%;margin:0;background:radial-gradient(ellipse at 20% 10%, rgba(0,255,213,0.02) 0%, transparent 20%),
+      linear-gradient(180deg,#020205 0%, #07101a 100%);font-family:var(--mono);display:flex;align-items:center;justify-content:center;}
+
+    /* background matrix lines */
+    .bg {
+      position:fixed;inset:0;pointer-events:none;overflow:hidden;mix-blend-mode:overlay;opacity:0.35;
+    }
+    .col{position:absolute;top:-10%;width:1px;height:120%;background:linear-gradient(180deg,transparent, rgba(0,255,213,0.06),transparent);filter:blur(0.6px)}
+
+    /* main card */
+    .card{
+      text-align:center;padding:40px 60px;border-radius:12px;backdrop-filter: blur(4px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6), var(--glow); border:1px solid rgba(255,255,255,0.02);
+    }
+
+    h1{
+      margin:0;font-size:clamp(28px, 7vw, 86px);letter-spacing:3px;color:#fff;position:relative;
+      text-transform:uppercase;
+      transform:translateZ(0);
+    }
+
+    /* neon glow */
+    .neon{
+      color:transparent;
+      -webkit-text-stroke:2px rgba(255,255,255,0.06);
+      background:linear-gradient(90deg, var(--accent), var(--accent2), #ffd100, #ff004d);
+      background-clip:text;-webkit-background-clip:text;
+      filter:drop-shadow(0 6px 20px rgba(0,0,0,0.6));
+      animation: hue 6s linear infinite;
+    }
+
+    @keyframes hue{0%{filter:drop-shadow(0 0 32px rgba(255,0,77,0.15));}50%{filter:drop-shadow(0 0 48px rgba(0,255,213,0.12));}100%{filter:drop-shadow(0 0 32px rgba(255,0,77,0.15));}}
+
+    /* flicker + typewriter */
+    .glitch{
+      position:relative;display:inline-block;
+      animation: flicker 3s infinite;
+    }
+    @keyframes flicker{
+      0%{opacity:1;transform:translateY(0)}
+      3%{opacity:.6;transform:translateY(-1px)}
+      5%{opacity:1;transform:translateY(0)}
+      9%{opacity:.85}
+      11%{opacity:1}
+    }
+
+    /* chromatic glitch layers */
+    .glitch::before, .glitch::after{
+      content:attr(data-text);
+      position:absolute;left:0;top:0;width:100%;
+      overflow:hidden;
+      clip-path:polygon(0 0,100% 0,100% 100%,0 100%);
+      opacity:.8;
+    }
+    .glitch::before{left:2px;text-shadow:-2px 0 var(--accent);transform:translateX(-2px) skewX(-6deg);mix-blend-mode:screen}
+    .glitch::after{left:-2px;text-shadow:2px 0 var(--accent2);transform:translateX(2px) skewX(6deg);mix-blend-mode:screen}
+
+    /* random horizontal slices */
+    .slice{position:relative;display:block}
+    .slice span{display:inline-block}
+
+    /* small caption */
+    p{margin-top:14px;color:rgba(255,255,255,0.6);font-size:14px}
+
+    /* pulse background ring */
+    .ring{position:absolute;inset:-40px;border-radius:20px;z-index:-1;background:radial-gradient(circle at 30% 20%, rgba(255,0,77,0.06), transparent 10%), radial-gradient(circle at 70% 80%, rgba(0,255,213,0.04), transparent 12%);
+      animation: spin 18s linear infinite;}
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+    /* button */
+    .btn{margin-top:22px;padding:10px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;cursor:pointer}
+    .btn:active{transform:translateY(2px)}
+
+    /* responsive */
+    @media (max-width:520px){.card{padding:28px 20px}}
+  </style>
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <div class="card" role="main">
+    <div class="ring" aria-hidden="true"></div>
+    <h1>
+      <span class="neon glitch" data-text="CONGRATULATION">CONGRATULATION</span>
+      <div class="slice" style="height:8px"></div>
+      <span class="neon glitch" data-text="YOU JUST GOT HACKED">YOU JUST GOT HACKED</span>
+    </h1>
+    <p>If this was a prank — nice. If not, relax: it's just a page. Want it scarier or funnier?</p>
+    <button class="btn" id="regen">Regenerate glitch</button>
+  </div>
+
+  <script>
+    // create subtle vertical 'matrix' lines in the bg
+    const bg = document.querySelector('.bg');
+    for(let i=0;i<80;i++){
+      const col = document.createElement('div');col.className='col';
+      col.style.left = (i*1.25)+'%';
+      col.style.opacity = (Math.random()*0.6+0.05).toFixed(2);
+      col.style.transform = 'translateY(' + (Math.random()*30 - 10) + 'px)';
+      col.style.height = (100 + Math.random()*30) + '%';
+      bg.appendChild(col);
+    }
+
+    // make the glitch slices random so each press changes effect
+    function randomize(){
+      document.querySelectorAll('.glitch').forEach((g)=>{
+        const text = g.getAttribute('data-text');
+        // split into random slices and re-render with slight offsets
+        const parts = [];
+        let i=0;
+        while(i<text.length){
+          const chunk = Math.max(1, Math.floor(Math.random()*6));
+          parts.push(text.slice(i,i+chunk));
+          i+=chunk;
+        }
+        g.innerHTML = parts.map((p,idx)=>`<span style=\"display:inline-block;transform:translateY(${(Math.random()*6-3).toFixed(1)}px) skewX(${(Math.random()*6-3).toFixed(1)}deg)\">${p}</span>`).join('');
+      });
+    }
+    document.getElementById('regen').addEventListener('click',randomize);
+    randomize();
+
+    // small periodic shake for drama
+    setInterval(()=>{
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(c=>{c.style.transform = `translateX(${(Math.random()*6-3).toFixed(1)}px)`;
+        setTimeout(()=>c.style.transform='translateX(0)',120);
+      });
+    },2500);
+  </script>
+</body>
+</html>
